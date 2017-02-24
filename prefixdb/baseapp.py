@@ -80,11 +80,19 @@ async def search_parents(request):
     return aiohttp.web.Response(text=json.dumps(output), content_type='application/json')
 
 
-def make_app(options={}):
-    app = aiohttp.web.Application()
+def make_app(loop=None, aiohttp_middlewares=[], middlewares=[]):
+    if not loop:
+        loop = asyncio.get_event_loop()
+
+    app = aiohttp.web.Application(middlewares=aiohttp_middlewares)
+    app['loop'] = loop
     app['database'] = Database()
+
     app.router.add_route('GET', '/node', lookup_node)
     app.router.add_route('PUT', '/node', upsert_node)
     app.router.add_route('GET', '/children', search_children)
     app.router.add_route('GET', '/parents', search_parents)
+
+    # XXX - handle middleware instantiation
+
     return app
