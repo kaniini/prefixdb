@@ -1,8 +1,14 @@
 import asyncio
 import aiohttp
 import aiohttp.web
-import ujson as json
 
+try:
+    import ujson as json
+except ImportError:
+    try:
+        import simplejson as json
+    except ImportError:
+        import json
 
 from .types import Database
 
